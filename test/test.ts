@@ -6,7 +6,6 @@ import {
   flatten,
   invert,
 } from "../src/matrixoperations/controllers/operation.controller";
-// import { sum } from "../src/matrixoperations/controllers/operation.controller";
 import sinon from "sinon";
 import httpMocks from "node-mocks-http";
 
