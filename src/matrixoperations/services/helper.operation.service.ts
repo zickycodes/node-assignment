@@ -1,8 +1,4 @@
 export class OperationService {
-  // constructor() {
-  //     // constructor logic if needed
-  // }
-
   static calculateProduct(matrix: any[][]): number {
     let product = 1;
     matrix.forEach((row) => {
