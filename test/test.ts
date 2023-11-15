@@ -10,10 +10,10 @@ import sinon from "sinon";
 import httpMocks from "node-mocks-http";
 
 describe("echo", () => {
-  it("should return the same matrix", async () => {
+  it("should return the product of the matrix in matrix format", async () => {
     const req = httpMocks.createRequest({
       method: "POST",
-      url: "/echo",
+      url: "/multiply",
       file: {
         path: "./matrix.csv",
       },
@@ -24,7 +24,29 @@ describe("echo", () => {
     await echo(req, res, next);
 
     const data = res._getData();
+
     expect(data).to.be.a("string");
+
+    const rows: Array<any> = data.split("\n");
+
+    // Check if there is at least one row
+    expect(rows).to.have.lengthOf.at.least(1);
+
+    const values = rows[0].split(",");
+
+    // Check if there is at least one value
+    expect(values).to.have.lengthOf.at.least(1);
+
+    // Check if each value is a number
+    values.forEach((value: number) => {
+      expect(Number(value)).to.be.a("number");
+    });
+
+    const matrixWidth = values.length;
+    rows.forEach((row) => {
+      const rowValues = row.split(",");
+      expect(rowValues).to.have.lengthOf(matrixWidth);
+    });
   });
 });
 
@@ -95,7 +117,7 @@ describe("flatten", () => {
 });
 
 describe("invert", () => {
-  it("should return the product of the matrix", async () => {
+  it("should return the product of the matrix in matrix format", async () => {
     const req = httpMocks.createRequest({
       method: "POST",
       url: "/multiply",
@@ -109,9 +131,28 @@ describe("invert", () => {
     await invert(req, res, next);
 
     const data = res._getData();
-    const product = Number(data);
 
-    // Check if the data is a number
-    expect(product).to.be.a("string");
+    expect(data).to.be.a("string");
+
+    const rows: Array<any> = data.split("\n");
+
+    // Check if there is at least one row
+    expect(rows).to.have.lengthOf.at.least(1);
+
+    const values = rows[0].split(",");
+
+    // Check if there is at least one value
+    expect(values).to.have.lengthOf.at.least(1);
+
+    // Check if each value is a number
+    values.forEach((value: number) => {
+      expect(Number(value)).to.be.a("number");
+    });
+
+    const matrixWidth = values.length;
+    rows.forEach((row) => {
+      const rowValues = row.split(",");
+      expect(rowValues).to.have.lengthOf(matrixWidth);
+    });
   });
 });
