@@ -1,7 +1,7 @@
 import express from "express";
 import { Router } from "express";
 import { echo, sum, flatten, invert, multiply } from "../operation.controller";
-import { upload } from "../../../midlleware/upload";
+import { upload } from "../../../midldleware/upload";
 const router = Router();
 
 router.post("/echo", upload.single("file"), echo);

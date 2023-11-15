@@ -9,7 +9,6 @@ export function helperFunc(
   next: NextFunction,
   action: string
 ) {
-  // calculate the sum of the integers and send response
   if (action === "sum") {
     const sum = OperationService.calculateSum(results);
     res.send(sum.toString());
@@ -44,3 +43,30 @@ export function helperFunc(
     }
   });
 }
+
+export const isValidMatrix = (matrix: number[][]): boolean => {
+  const numRows = matrix.length;
+
+  // Empty matrix
+  if (numRows === 0) {
+    return false;
+  }
+
+  const numCols = matrix[0].length;
+
+  // Not a square matrix
+  if (numRows !== numCols) {
+    return false;
+  }
+
+  // Check if all values are integers
+  for (const row of matrix) {
+    for (const value of row) {
+      if (isNaN(value)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};

@@ -1,25 +1,48 @@
 import csvParser from "csv-parser";
 import fs from "fs";
 import { Response, Request, NextFunction } from "express";
-import { helperFunc } from "../../helper/helper";
+import { helperFunc, isValidMatrix } from "../../helper/helper";
 // import { OperationService } from "../services/helper.operation.service";
 
 export const echo = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.file) {
-    res.status(400).send("No file uploaded");
-    return;
-  }
-  const results: any[] = [];
+  try {
+    if (!req.file) {
+      res.status(400).send("No file uploaded");
+      return;
+    }
 
-  fs.createReadStream(req.file.path)
-    .pipe(csvParser({ headers: false }))
-    .on("data", (data) => {
-      results.push(Object.values(data));
-      // console.log(data);
-    }) // push each row of data into results array
-    .on("end", () => {
-      helperFunc(results, req, res, next, "echo");
+    const results: any[] = [];
+
+    const fileStream = fs.createReadStream(req.file.path);
+
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).send("Internal server error");
     });
+
+    fileStream
+      .pipe(csvParser({ headers: false }))
+      .on("data", (data: number) => {
+        if (Object.values(data).length > 0) {
+          results.push(Object.values(data));
+        }
+      })
+      .on("end", () => {
+        // console.log("Parsed Matrix:", results);
+        if (isValidMatrix(results)) {
+          helperFunc(results, req, res, next, "echo");
+        } else {
+          res.status(400).send("Invalid matrix format");
+        }
+      })
+      .on("error", (err) => {
+        console.error("CSV parsing error:", err);
+        res.status(500).send("Internal server error");
+      });
+  } catch (error) {
+    console.error("Synchronous error:", error);
+    res.status(500).send("Internal server error");
+  }
 };
 
 export const invert = async (
@@ -27,18 +50,47 @@ export const invert = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.file) {
-    res.status(400).send("No file uploaded");
-    return;
-  }
-  const results: any[] = [];
+  try {
+    if (!req.file) {
+      res.status(400).send("No file uploaded");
+      return;
+    }
 
-  fs.createReadStream(req.file.path)
-    .pipe(csvParser({ headers: false }))
-    .on("data", (data: any) => results.push(Object.values(data))) // push each row of data into results array
-    .on("end", () => {
-      helperFunc(results, req, res, next, "invert");
+    const results: any[] = [];
+
+    const fileStream = fs.createReadStream(req.file.path);
+
+    fileStream.on("error", (err) => {
+      // Handle file stream error
+      console.error("File stream error:", err);
+      res.status(500).send("Internal server error");
     });
+
+    fileStream
+      .pipe(csvParser({ headers: false }))
+      .on("data", (data: number) => {
+        if (Object.values(data).length > 0) {
+          results.push(Object.values(data));
+        }
+      })
+      .on("end", () => {
+        // console.log("Parsed Matrix:", results);
+        if (isValidMatrix(results)) {
+          helperFunc(results, req, res, next, "invert");
+        } else {
+          res.status(400).send("Invalid matrix format");
+        }
+      })
+      .on("error", (err) => {
+        // Handle CSV parsing error
+        console.error("CSV parsing error:", err);
+        res.status(500).send("Internal server error");
+      });
+  } catch (error) {
+    // Handle any synchronous errors that might occur
+    console.error("Synchronous error:", error);
+    res.status(500).send("Internal server error");
+  }
 };
 
 export const flatten = async (
@@ -46,33 +98,86 @@ export const flatten = async (
   res: Response,
   next: NextFunction
 ) => {
-  const results: any[] = [];
-  if (!req.file) {
-    res.status(400).send("No file uploaded");
-    return;
-  }
+  try {
+    const results: any[] = [];
+    if (!req.file) {
+      res.status(400).send("No file uploaded");
+      return;
+    }
 
-  fs.createReadStream(req.file.path)
-    .pipe(csvParser({ headers: false }))
-    .on("data", (data: any) => results.push(Object.values(data))) // push each row of data into results array
-    .on("end", () => {
-      helperFunc(results, req, res, next, "flatten");
+    const fileStream = fs.createReadStream(req.file.path);
+
+    fileStream.on("error", (err) => {
+      // Handle file stream error
+      console.error("File stream error:", err);
+      res.status(500).send("Internal server error");
     });
+
+    fileStream
+      .pipe(csvParser({ headers: false }))
+      .on("data", (data: number) => {
+        if (Object.values(data).length > 0) {
+          results.push(Object.values(data));
+        }
+      })
+      .on("end", () => {
+        // console.log("Parsed Matrix:", results);
+        if (isValidMatrix(results)) {
+          helperFunc(results, req, res, next, "flatten");
+        } else {
+          res.status(400).send("Invalid matrix format");
+        }
+      })
+      .on("error", (err) => {
+        // Handle CSV parsing error
+        console.error("CSV parsing error:", err);
+        res.status(500).send("Internal server error");
+      });
+  } catch (error) {
+    // Handle any synchronous errors that might occur
+    console.error("Synchronous error:", error);
+    res.status(500).send("Internal server error");
+  }
 };
 
 export const sum = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.file) {
-    res.status(400).send("No file uploaded");
-    return;
-  }
-  const results: any[] = [];
-  fs.createReadStream(req.file.path)
-    .pipe(csvParser({ headers: false }))
-    .on("data", (data: any) => results.push(Object.values(data))) // push each row of data into results array
-    .on("end", () => {
-      // calculate the sum of the integers and send response
-      helperFunc(results, req, res, next, "sum");
+  try {
+    if (!req.file) {
+      res.status(400).send("No file uploaded");
+      return;
+    }
+
+    const results: any[] = [];
+    const fileStream = fs.createReadStream(req.file.path);
+
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).send("Internal server error");
     });
+
+    fileStream
+      .pipe(csvParser({ headers: false }))
+      .on("data", (data: number) => {
+        if (Object.values(data).length > 0) {
+          results.push(Object.values(data));
+        }
+      })
+      .on("end", () => {
+        // console.log("Parsed Matrix:", results);
+        if (isValidMatrix(results)) {
+          helperFunc(results, req, res, next, "sum");
+        } else {
+          res.status(400).send("Invalid matrix format");
+        }
+      })
+      .on("error", (err) => {
+        console.error("CSV parsing error:", err);
+        res.status(500).send("Internal server error");
+      });
+  } catch (error) {
+    console.error("Synchronous error:", error);
+    res.status(500).send("Internal server error");
+  }
 };
 
 export const multiply = async (
@@ -80,16 +185,41 @@ export const multiply = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.file) {
-    res.status(400).send("No file uploaded");
-    return;
-  }
-  const results: any[] = [];
+  try {
+    if (!req.file) {
+      res.status(400).send("No file uploaded");
+      return;
+    }
 
-  fs.createReadStream(req.file.path)
-    .pipe(csvParser({ headers: false }))
-    .on("data", (data: any) => results.push(Object.values(data))) // push each row of data into results array
-    .on("end", () => {
-      helperFunc(results, req, res, next, "multiply");
+    const results: any[] = [];
+    const fileStream = fs.createReadStream(req.file.path);
+
+    fileStream.on("error", (err) => {
+      console.error("File stream error:", err);
+      res.status(500).send("Internal server error");
     });
+
+    fileStream
+      .pipe(csvParser({ headers: false }))
+      .on("data", (data: number) => {
+        if (Object.values(data).length > 0) {
+          results.push(Object.values(data));
+        }
+      })
+      .on("end", () => {
+        // console.log("Parsed Matrix:", results);
+        if (isValidMatrix(results)) {
+          helperFunc(results, req, res, next, "multiply");
+        } else {
+          res.status(400).send("Invalid matrix format");
+        }
+      })
+      .on("error", (err) => {
+        console.error("CSV parsing error:", err);
+        res.status(500).send("Internal server error");
+      });
+  } catch (error) {
+    console.error("Synchronous error:", error);
+    res.status(500).send("Internal server error");
+  }
 };
